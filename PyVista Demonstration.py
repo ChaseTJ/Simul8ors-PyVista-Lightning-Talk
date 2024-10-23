@@ -126,64 +126,63 @@ p.show()
 
 
 
-"""
-Ang's Slider Perlin
-"""
-Sample Function: Perlin Noise in 3D
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Here we use :func:`pyvista.core.utilities.features.sample_function` to sample
-Perlin noise over a region to generate random terrain.
+# """
+# Ang's Slider Perlin
+# Sample Function: Perlin Noise in 3D
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Here we use :func:`pyvista.core.utilities.features.sample_function` to sample
+# Perlin noise over a region to generate random terrain.
 
-Video games like Minecraft use Perlin noise to create terrain.  Here,
-we create a voxelized mesh similar to a Minecraft "cave".
-"""
+# Video games like Minecraft use Perlin noise to create terrain.  Here,
+# we create a voxelized mesh similar to a Minecraft "cave".
+# """
 
-from __future__ import annotations
-import pyvista as pv
-
-
-class CaveGenerator:
-    def __init__(self, mesh):
-        self.output = mesh  # Expected PyVista mesh type
-        self.frequency = 1.0
-        self.generate_mesh()  # Generate the initial mesh
-
-    def __call__(self, param, value):
-        if param == 'frequency':
-            self.frequency = value
-        self.update()
-
-    def update(self):
-        self.generate_mesh()  # Regenerate the mesh with the updated frequency
-        self.output.copy_from(self.new_mesh)
-
-    def generate_mesh(self):
-        # Generate Perlin noise based on the current frequency
-        noise = pv.perlin_noise(1, (self.frequency, self.frequency, self.frequency), (0, 0, 0))
-        grid = pv.sample_function(noise, [0, 3.0, -0, 1.0, 0, 1.0], dim=(120, 40, 40))
-        self.new_mesh = grid.threshold(0.02)  # Store the new mesh
+# from __future__ import annotations
+# import pyvista as pv
 
 
-# Starting mesh and generator
-starting_mesh = pv.UnstructuredGrid()  # Placeholder for the initial mesh
-engine = CaveGenerator(starting_mesh)
+# class CaveGenerator:
+#     def __init__(self, mesh):
+#         self.output = mesh  # Expected PyVista mesh type
+#         self.frequency = 1.0
+#         self.generate_mesh()  # Generate the initial mesh
 
-# Create a plotter
-plotter = pv.Plotter()
+#     def __call__(self, param, value):
+#         if param == 'frequency':
+#             self.frequency = value
+#         self.update()
 
-# Add the initial mesh to the plot
-plotter.add_mesh(engine.new_mesh, color='tan', show_edges=True)  # Add the initially generated mesh
+#     def update(self):
+#         self.generate_mesh()  # Regenerate the mesh with the updated frequency
+#         self.output.copy_from(self.new_mesh)
 
-# Slider for frequency
-plotter.add_slider_widget(
-    callback=lambda value: engine('frequency', int(value)),
-    rng=[0.1, 5.0],
-    value=1.0,
-    title="Frequency",
-    pointa=(0.1, 0.1),
-    pointb=(0.9, 0.1),
-    style='modern',
-)
+#     def generate_mesh(self):
+#         # Generate Perlin noise based on the current frequency
+#         noise = pv.perlin_noise(1, (self.frequency, self.frequency, self.frequency), (0, 0, 0))
+#         grid = pv.sample_function(noise, [0, 3.0, -0, 1.0, 0, 1.0], dim=(120, 40, 40))
+#         self.new_mesh = grid.threshold(0.02)  # Store the new mesh
 
-plotter.show()
-"""
+
+# # Starting mesh and generator
+# starting_mesh = pv.UnstructuredGrid()  # Placeholder for the initial mesh
+# engine = CaveGenerator(starting_mesh)
+
+# # Create a plotter
+# plotter = pv.Plotter()
+
+# # Add the initial mesh to the plot
+# plotter.add_mesh(engine.new_mesh, color='tan', show_edges=True)  # Add the initially generated mesh
+
+# # Slider for frequency
+# plotter.add_slider_widget(
+#     callback=lambda value: engine('frequency', int(value)),
+#     rng=[0.1, 5.0],
+#     value=1.0,
+#     title="Frequency",
+#     pointa=(0.1, 0.1),
+#     pointb=(0.9, 0.1),
+#     style='modern',
+# )
+
+# plotter.show()
+
