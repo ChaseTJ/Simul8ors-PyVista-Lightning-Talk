@@ -9,20 +9,22 @@ import numpy as np
 
 # %% Basic Mesh Plotting Example
 
-# Using a mesh included in PyVista as an example
-cow = pv.examples.download_cow()
+# groot_big = pv.read('Waving_Groot_15.5cm.stl')
+# groot = groot_big.decimate(0.9)
+# groot.save('groot.stl')
+
+groot = pv.read('groot.stl')
 
 # Creating the plotter
 p = pv.Plotter()
 
 # Adding the cow mesh to the plotter, setting the color to burn orange and turning on smooth shading
-p.add_mesh(cow, color='#CC5500', smooth_shading=True, show_edges=True)
+p.add_mesh(groot, color='#CC5500', smooth_shading=False, show_edges=False)
 
-# Addjust the camera position so the cow is rightside up
 p.camera_position = [
-    [12, 12, 12],   # Position: Camera location in space
-    [0, 0, 0],   # Focal point: Point where the camera is looking (the center of the sphere)
-    [0, 0, 0]    # View up: The "up" direction in the camera's view
+    [0, -300, 100],   # Position: Camera location in space
+    [75, 100, 75],   # Focal point: Point where the camera is looking (the center of the sphere)
+    [0, 0, 1]    # View up: The "up" direction in the camera's view
 ]
 
 p.show()
@@ -101,13 +103,15 @@ p.show()
 
 # freq = (1, 1, 1)
 # noise = pv.perlin_noise(1, freq, (0, 0, 0))
-# grid = pv.sample_function(noise, [0, 3.0, -0, 1.0, 0, 1.0], dim=(120, 40, 40))
+# grid = pv.sample_function(noise, [0, 3.0, -0, 3.0, 0, 3.0], dim=(120, 120, 120))
 # out = grid.threshold(0.02)
 # out
 # mn, mx = [out["scalars"].min(), out["scalars"].max()]
 # clim = (mn, mx * 1.8)
 
-# out.plot(
+# p = pv.Plotter()
+
+# out.add_mesh(
 #     cmap="gist_earth_r",
 #     background="white",
 #     show_scalar_bar=False,
@@ -115,3 +119,7 @@ p.show()
 #     clim=clim,
 #     show_edges=False,
 # )
+
+# p.add_mesh_threshold(out)
+
+# p.show()
