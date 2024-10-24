@@ -4,6 +4,11 @@ Goes over some of the features of the PyVista Library
 -Ang Gao- -Chase Johnson- -Leo Kern-
 '''
 
+# %% Installation
+
+# pip install pyvista
+
+# %% Imports
 from __future__ import annotations
 import pyvista as pv
 import numpy as np
@@ -11,26 +16,30 @@ import numpy as np
 
 
 # %% Basic Mesh Plotting Example
+# Model from https://www.thingiverse.com/thing:2014307/files
 
+# # Decimating the original stl because it was too large
 # groot_big = pv.read('Waving_Groot_15.5cm.stl')
 # groot = groot_big.decimate(0.9)
 # groot.save('groot.stl')
 
-# groot = pv.read('groot.stl')
+# Read in the new smaller stl
+groot = pv.read('groot.stl')
 
-# # Creating the plotter
-# p = pv.Plotter()
+# Creating the plotter
+p = pv.Plotter()
 
-# # Adding the cow mesh to the plotter, setting the color to burn orange and turning on smooth shading
-# p.add_mesh(groot, color='#CC5500', smooth_shading=False, show_edges=False)
+# Adding the mesh to the plotter, setting the color to burn orange and turning on smooth shading
+p.add_mesh(groot, color='#CC5500', smooth_shading=False)
 
+# Changing the camera position to give a better starting view
 # p.camera_position = [
 #     [0, -300, 100],   # Position: Camera location in space
-#     [75, 100, 75],   # Focal point: Point where the camera is looking (the center of the sphere)
+#     [75, 100, 75],   # Focal point: Point where the camera is looking
 #     [0, 0, 1]    # View up: The "up" direction in the camera's view
 # ]
 
-# p.show()
+p.show()
 
 
 # %% Plane Widget Example
@@ -104,31 +113,6 @@ import numpy as np
 # %% Filters example
 # https://tutorial.pyvista.org/tutorial/04_filters/bonus/f_sampling_functions_3d.html#sphx-glr-tutorial-04-filters-bonus-f-sampling-functions-3d-py
 
-# freq = (1, 1, 1)
-# noise = pv.perlin_noise(1, freq, (0, 0, 0))
-# grid = pv.sample_function(noise, [0, 3.0, -0, 3.0, 0, 3.0], dim=(120, 120, 120))
-# out = grid.threshold(0.02)
-# out
-# mn, mx = [out["scalars"].min(), out["scalars"].max()]
-# clim = (mn, mx * 1.8)
-
-# p = pv.Plotter()
-
-# out.add_mesh(
-#     cmap="gist_earth_r",
-#     background="white",
-#     show_scalar_bar=False,
-#     lighting=True,
-#     clim=clim,
-#     show_edges=False,
-# )
-
-# p.add_mesh_threshold(out)
-
-# p.show()
-
-
-
 """
 Ang's Slider Perlin
 Sample Function: Perlin Noise in 3D
@@ -140,42 +124,45 @@ Video games like Minecraft use Perlin noise to create terrain.  Here,
 we create a voxelized mesh similar to a Minecraft "cave".
 """
 
-# import pyvista as pv
-
 # class CaveGenerator:
-#     def __init__(self, mesh, plotter):
-#         self.output = mesh  # PyVista mesh
-#         self.plotter = plotter  # Make sure plotter is assigned here
-#         self.frequency = 1.0
-#         self.mesh_actor = None  # This will store the mesh actor (reference)
+#     def __init__(self, plotter):
+#         self.plotter = plotter  # Store the plotter reference
+#         self.frequency = (1.0, 1.0, 1.0)
+#         self.mesh_actor = None  # This will store the mesh actor reference
 #         self.generate_mesh()  # Generate the initial mesh
 
 #     def __call__(self, param, value):
 #         if param == 'frequency':
-#             self.frequency = value
+#             self.frequency = (value, value, value)  # Set frequency to the slider value
 #         self.update()
 
 #     def update(self):
 #         self.generate_mesh()  # Regenerate the mesh with the updated frequency
 #         if self.mesh_actor is not None:
 #             self.plotter.remove_actor(self.mesh_actor)  # Remove the old mesh
-#         self.mesh_actor = self.plotter.add_mesh(self.new_mesh, color='tan', show_edges=True)  # Add new mesh
+#         # Add the new mesh with scalar mapping for color
+#         mn, mx = self.new_mesh["scalars"].min(), self.new_mesh["scalars"].max()
+#         clim = (mn, mx * 1.8)
+#         self.mesh_actor = self.plotter.add_mesh(
+#             self.new_mesh, scalars="scalars", cmap="gist_earth_r", show_edges=False, clim=clim, lighting=True, show_scalar_bar=False  # Set show_scalar_bar to False
+#         )
 
 #     def generate_mesh(self):
 #         # Generate Perlin noise based on the current frequency
-#         noise = pv.perlin_noise(1, (self.frequency, self.frequency, self.frequency), (0, 0, 0))
-#         grid = pv.sample_function(noise, [0, 3.0, -0, 3.0, 0, 3.0], dim=(120, 120, 120))
-#         self.new_mesh = grid.threshold(0.02)  # Store the new mesh
+#         noise = pv.perlin_noise(1, self.frequency, (0, 0, 0))
+#         grid = pv.sample_function(noise, [0, 3.0, -0, 1.0, 0, 3.0], dim=(120, 40, 120))
+        
+#         # Use thresholding to create a mesh based on noise values
+#         self.new_mesh = grid.threshold(0.02)
 
 # # Create a plotter
 # plotter = pv.Plotter()
 
-# # Starting mesh and generator
-# starting_mesh = pv.UnstructuredGrid()  # Placeholder for the initial mesh
-# engine = CaveGenerator(starting_mesh, plotter)  # Pass plotter to the CaveGenerator
+# # Create the cave generator and pass the plotter reference
+# engine = CaveGenerator(plotter)
 
 # # Add the initial mesh to the plot
-# engine.mesh_actor = plotter.add_mesh(engine.new_mesh, color='tan', show_edges=True)  # Add the initially generated mesh
+# engine.mesh_actor = plotter.add_mesh(engine.new_mesh, scalars="scalars", cmap="gist_earth_r", show_edges=False, show_scalar_bar=False)  # Set show_scalar_bar to False
 
 # # Slider for frequency
 # plotter.add_slider_widget(
@@ -187,62 +174,6 @@ we create a voxelized mesh similar to a Minecraft "cave".
 #     pointb=(0.9, 0.1),
 #     style='modern',
 # )
-
+# # Display the plotter
 # plotter.show()
-
-# %% Cave with colors
-
-class CaveGenerator:
-    def __init__(self, plotter):
-        self.plotter = plotter  # Store the plotter reference
-        self.frequency = (1.0, 1.0, 1.0)
-        self.mesh_actor = None  # This will store the mesh actor reference
-        self.generate_mesh()  # Generate the initial mesh
-
-    def __call__(self, param, value):
-        if param == 'frequency':
-            self.frequency = (value, value, value)  # Set frequency to the slider value
-        self.update()
-
-    def update(self):
-        self.generate_mesh()  # Regenerate the mesh with the updated frequency
-        if self.mesh_actor is not None:
-            self.plotter.remove_actor(self.mesh_actor)  # Remove the old mesh
-        # Add the new mesh with scalar mapping for color
-        mn, mx = self.new_mesh["scalars"].min(), self.new_mesh["scalars"].max()
-        clim = (mn, mx * 1.8)
-        self.mesh_actor = self.plotter.add_mesh(
-            self.new_mesh, scalars="scalars", cmap="gist_earth_r", show_edges=False, clim=clim, lighting=True, show_scalar_bar=False  # Set show_scalar_bar to False
-        )
-
-    def generate_mesh(self):
-        # Generate Perlin noise based on the current frequency
-        noise = pv.perlin_noise(1, self.frequency, (0, 0, 0))
-        grid = pv.sample_function(noise, [0, 3.0, -0, 1.0, 0, 3.0], dim=(120, 40, 120))
-        
-        # Use thresholding to create a mesh based on noise values
-        self.new_mesh = grid.threshold(0.02)
-
-# Create a plotter
-plotter = pv.Plotter()
-
-# Create the cave generator and pass the plotter reference
-engine = CaveGenerator(plotter)
-
-# Add the initial mesh to the plot
-engine.mesh_actor = plotter.add_mesh(engine.new_mesh, scalars="scalars", cmap="gist_earth_r", show_edges=False, show_scalar_bar=False)  # Set show_scalar_bar to False
-
-# Slider for frequency
-plotter.add_slider_widget(
-    callback=lambda value: engine('frequency', value),
-    rng=[0.1, 5.0],
-    value=1.0,
-    title="Frequency",
-    pointa=(0.1, 0.1),
-    pointb=(0.9, 0.1),
-    style='modern',
-)
-
-# Display the plotter
-plotter.show()
 
